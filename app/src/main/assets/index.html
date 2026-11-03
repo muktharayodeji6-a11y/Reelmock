@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
+<title>ReelMock</title>
+<style>
+:root{--bg:#0b0b10;--card:#15151d;--line:#262633;--txt:#f2f2f7;--dim:#8d8da3;--pink:#ff3d8b;--vio:#7c5cff;--ok:#2ee59d;--bad:#ff5a5f;--warn:#ffc42e}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Roboto,sans-serif}
+body{padding-bottom:40px;overflow-x:hidden}
+.orb{position:fixed;width:320px;height:320px;border-radius:50%;filter:blur(90px);opacity:.28;z-index:0;pointer-events:none;animation:drift 14s ease-in-out infinite alternate}
+.o1{background:var(--vio);top:-100px;left:-100px}.o2{background:var(--pink);bottom:-120px;right:-100px;animation-delay:-7s}
+@keyframes drift{to{transform:translate(60px,80px) scale(1.2)}}
+.demo{position:sticky;top:0;z-index:20;text-align:center;font-weight:800;font-size:12px;letter-spacing:.14em;padding:9px 10px;color:#1a1300;
+ background:repeating-linear-gradient(-45deg,var(--warn) 0 14px,#e8a900 14px 28px);background-size:200% 100%;animation:stripes 3s linear infinite}
+.demo i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#b00020;margin-right:8px;animation:pulse 1.2s infinite}
+@keyframes stripes{to{background-position:56px 0}}
+@keyframes pulse{50%{opacity:.25;transform:scale(1.5)}}
+main{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:18px 16px}
+h1{margin:6px 0 2px;font-size:28px;letter-spacing:-.02em;background:linear-gradient(90deg,var(--pink),var(--vio));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--dim);font-size:13px;margin-bottom:14px}
+.chip{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;padding:6px 12px;border-radius:99px;border:1px solid var(--line);margin-bottom:14px}
+.chip.valid{color:var(--ok);border-color:var(--ok);background:#2ee59d14}
+.chip.invalid{color:var(--bad);border-color:var(--bad);background:#ff5a5f14}
+.chip.idle{color:var(--dim)}
+.chip.src{color:var(--vio);border-color:var(--vio);background:#7c5cff14;margin-left:6px}
+.h b{font-size:10px;letter-spacing:.08em;color:var(--vio);font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;animation:rise .5s both}
+.card:nth-of-type(2){animation-delay:.05s}.card:nth-of-type(3){animation-delay:.1s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.card.pop{animation:pop .6s}
+@keyframes pop{0%{box-shadow:0 0 0 0 #ff3d8b99;transform:scale(.97)}60%{box-shadow:0 0 0 14px #ff3d8b00;transform:scale(1.015)}100%{transform:none}}
+.lbl{font-size:11px;letter-spacing:.12em;color:var(--dim);margin-bottom:6px;text-transform:uppercase}
+.val{word-break:break-all;font-size:14px;line-height:1.4}
+.id{font:700 26px ui-monospace,Menlo,monospace;color:var(--pink);word-break:break-all}
+.row{display:flex;gap:12px}.row .card{flex:1;min-width:0}
+.err{border-color:var(--bad);background:#ff5a5f10}.err .val{color:#ffb3b5}
+.hide{display:none!important}
+.stage{display:flex;justify-content:center;margin:18px 0}
+.phone{position:relative;width:min(70vw,250px);aspect-ratio:9/16;border-radius:28px;overflow:hidden;border:2px solid #34344a;
+ background:linear-gradient(160deg,#ff3d8b,#7c5cff,#00c2ff,#ff3d8b);background-size:300% 300%;animation:grad 8s ease infinite;box-shadow:0 20px 60px #7c5cff44}
+.phone.paused,.phone.paused *{animation-play-state:paused!important}
+@keyframes grad{50%{background-position:100% 100%}}
+.phone .shade{position:absolute;inset:0;background:linear-gradient(transparent 45%,#000a)}
+.mark{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:46px;letter-spacing:.2em;color:#ffffff22;transform:rotate(-30deg);pointer-events:none}
+.play{position:absolute;left:50%;top:44%;width:64px;height:64px;margin:-32px;border-radius:50%;background:#00000055;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);animation:ring 2s infinite}
+.play:after{content:"";border-left:20px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:6px}
+.phone.paused .play{opacity:1}.phone:not(.paused) .play{opacity:.0}
+@keyframes ring{0%{box-shadow:0 0 0 0 #fff5}100%{box-shadow:0 0 0 22px #fff0}}
+.cap{position:absolute;left:12px;right:60px;bottom:22px;font-size:12px}
+.cap b{display:block;margin-bottom:3px}.cap span{opacity:.85;font-family:ui-monospace,monospace}
+.eq{display:flex;gap:3px;align-items:flex-end;height:14px;margin-top:6px}
+.eq u{width:3px;background:#fff;border-radius:2px;animation:eq 1s ease-in-out infinite alternate}
+.eq u:nth-child(2){animation-delay:-.3s}.eq u:nth-child(3){animation-delay:-.6s}.eq u:nth-child(4){animation-delay:-.15s}
+@keyframes eq{from{height:3px}to{height:14px}}
+.rail{position:absolute;right:10px;bottom:30px;display:flex;flex-direction:column;gap:14px}
+.rail div{width:34px;height:34px;border-radius:50%;background:#0006;display:flex;align-items:center;justify-content:center;font-size:15px}
+.rail div.liked{background:var(--pink);animation:beat .4s}
+@keyframes beat{50%{transform:scale(1.35)}}
+.bar{position:absolute;left:0;bottom:0;height:3px;background:#fff;width:0;animation:prog 12s linear infinite}
+@keyframes prog{to{width:100%}}
+.tag{position:absolute;top:10px;left:10px;font-size:10px;font-weight:800;letter-spacing:.1em;background:#000a;padding:4px 8px;border-radius:99px}
+button{width:100%;font:700 15px system-ui;border:0;border-radius:14px;padding:14px;color:#fff;background:linear-gradient(90deg,var(--pink),var(--vio));margin-bottom:10px}
+button:active{transform:scale(.98)}button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim)}
+.h{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:12px}
+.h:first-child{border-top:0}.h code{color:var(--pink);font-family:ui-monospace,monospace}.h span{color:var(--dim)}
+.note{font-size:11px;color:var(--dim);text-align:center;margin-top:16px;line-height:1.5}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div class="demo"><i></i>DEMONSTRATION MODE &middot; MOCK INTERFACE</div>
+<main>
+  <h1>ReelMock</h1>
+  <div class="sub">Receives shared &amp; tapped Reel links &middot; works fully offline</div>
+  <div><span id="chip" class="chip idle">WAITING FOR SHARE</span><span id="src" class="chip src hide"></span></div>
+
+  <div id="errCard" class="card err hide">
+    <div class="lbl">Rejected</div>
+    <div class="val" id="errReason"></div>
+    <div class="val" id="errRaw" style="margin-top:8px;opacity:.7;font-size:12px"></div>
+  </div>
+
+  <div class="card" data-pop>
+    <div class="lbl">Original URL</div>
+    <div class="val" id="url">&mdash;</div>
+  </div>
+  <div class="card" data-pop>
+    <div class="lbl">Reel ID</div>
+    <div class="id" id="rid">&mdash;</div>
+  </div>
+  <div class="row">
+    <div class="card"><div class="lbl">Received</div><div class="val" id="ts">&mdash;</div></div>
+    <div class="card"><div class="lbl">Total received</div><div class="val" id="cnt">0</div></div>
+  </div>
+
+  <div class="stage">
+    <div class="phone paused" id="phone">
+      <div class="tag">MOCK &middot; NOT REAL VIDEO</div>
+      <div class="shade"></div><div class="mark">DEMO</div><div class="play"></div>
+      <div class="rail"><div id="like">&#9829;</div><div>&#9993;</div><div>&#8943;</div></div>
+      <div class="cap"><b>@demo_account</b><span id="capId">no reel yet</span>
+        <div class="eq"><u></u><u></u><u></u><u></u></div></div>
+      <div class="bar"></div>
+    </div>
+  </div>
+
+  <button id="open" class="hide">Open original link</button>
+  <button id="clear" class="ghost hide">Clear stored data</button>
+
+  <div class="card" id="histCard"><div class="lbl">Recent shares</div><div id="hist"></div></div>
+  <div class="note">DEMONSTRATION APP. The video area is a generated animation, not Instagram content.<br>Not affiliated with or endorsed by Instagram / Meta.</div>
+</main>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var lastKey=null;
+  function fmt(ts){try{return ts?new Date(ts).toLocaleString():"\u2014"}catch(e){return "\u2014"}}
+  function srcLabel(k){return k==='share'?{long:'ANDROID SHARE',short:'SHARE'}:k==='view'?{long:'URL HANDLER (ACTION_VIEW)',short:'LINK'}:null}
+  function pop(){document.querySelectorAll('[data-pop]').forEach(function(c){c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop')})}
+  window.ReelMock={render:function(s){
+    var cur=s.current, chip=$('chip');
+    chip.className='chip '+s.status;
+    chip.textContent=s.status==='valid'?'URL RECEIVED':s.status==='invalid'?'INVALID URL REJECTED':(cur?'LAST SAVED REEL':'WAITING FOR SHARE');
+    var sl=srcLabel(s.source||(cur&&s.status==='idle'?cur.source:null)), sc=$('src');
+    sc.textContent=sl?('VIA '+sl.long):'';sc.classList.toggle('hide',!sl);
+    var bad=s.status==='invalid';
+    $('errCard').classList.toggle('hide',!bad);
+    if(bad){$('errReason').textContent=s.reason||'Invalid';$('errRaw').textContent=s.raw?('Received: '+s.raw):''}
+    $('url').textContent=cur?cur.url:'\u2014';
+    $('rid').textContent=cur?cur.id:'\u2014';
+    $('ts').textContent=cur?fmt(cur.ts):'\u2014';
+    $('cnt').textContent=String(s.shareCount||0);
+    $('capId').textContent=cur?('reel/'+cur.id):'no reel yet';
+    $('open').classList.toggle('hide',!cur);
+    $('clear').classList.toggle('hide',!cur);
+    var key=cur?cur.id+'|'+cur.ts:'';
+    if(key!==lastKey&&cur&&s.status==='valid'){pop()}
+    lastKey=key;
+    var h=$('hist');h.textContent='';
+    var list=s.history||[];
+    if(!list.length){var e=document.createElement('div');e.className='h';e.textContent='Nothing yet. Share a Reel to ReelMock, or open a Reel link with it.';h.appendChild(e)}
+    list.forEach(function(it){
+      var d=document.createElement('div');d.className='h';
+      var c=document.createElement('code');c.textContent=it.id;
+      var t=document.createElement('span');t.textContent=fmt(it.ts);
+      d.appendChild(c);
+      var l=srcLabel(it.src);if(l){var b=document.createElement('b');b.textContent=l.short;d.appendChild(b)}
+      d.appendChild(t);h.appendChild(d)});
+  }};
+  $('phone').addEventListener('click',function(){this.classList.toggle('paused')});
+  $('like').addEventListener('click',function(e){e.stopPropagation();this.classList.toggle('liked')});
+  $('open').addEventListener('click',function(){if(window.Android)Android.openOriginal()});
+  $('clear').addEventListener('click',function(){if(window.Android)Android.clearHistory()});
+  window.ReelMock.render({status:'idle',current:null,shareCount:0,history:[]});
+})();
+</script>
+</body>
+</html>
