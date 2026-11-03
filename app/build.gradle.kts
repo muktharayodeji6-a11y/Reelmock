@@ -15,9 +15,25 @@ android {
         versionName = "1.0"
     }
 
-    buildTypes {
-        release { isMinifyEnabled = false }
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("reelmock-debug.keystore")
+            storePassword = "android"
+            keyAlias = "reelmock"
+            keyPassword = "android"
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+        }
     }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+    lint { checkReleaseBuilds = false }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
