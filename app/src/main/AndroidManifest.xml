@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Deliberately NO INTERNET permission: the app works fully offline. -->
-
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -17,36 +15,15 @@
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|uiMode">
 
-            <!-- Normal launcher entry -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Standard Android share target: appears in the system Share sheet. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
-            </intent-filter>
-
-            <!-- URL handler: https Instagram Reel links only.
-                 NO android:autoVerify. ReelMock does not own instagram.com and cannot be a
-                 verified App Link handler. On Android 12+ the user must approve these links for
-                 ReelMock (Settings > Apps > ReelMock > Open by default) before the system will
-                 route them here; Instagram's own verified links take precedence when installed.
-                 The manifest only pre-filters; ReelParser is the real validator. -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" />
-                <data android:host="instagram.com" />
-                <data android:host="www.instagram.com" />
-                <data android:host="m.instagram.com" />
-                <data android:pathPrefix="/reel/" />
-                <data android:pathPrefix="/reels/" />
-                <data android:pathPattern="/.*/reel/.*" />
             </intent-filter>
         </activity>
     </application>
