@@ -15,9 +15,25 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.7
-      - name: Unit tests + debug APK
-        run: gradle --no-daemon testDebugUnitTest assembleDebug
+      - name: Unit tests + debug and release APKs
+        run: gradle --no-daemon testDebugUnitTest assembleDebug assembleRelease
+      - name: Verify APK
+        run: |
+          set -eo pipefail
+          BT="$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          for APK in app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/release/app-release.apk; do
+          {
+            echo "######## $APK"
+            sha256sum "$APK"
+            "$BT/aapt2" dump badging "$APK" | grep -E "^(package|sdkVersion|targetSdkVersion|uses-permission|native-code|application-debuggable)" || true
+            "$BT/apksigner" verify --verbose --print-certs "$APK"
+          } 2>&1 | tee -a apk-report.txt
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: ReelMock-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release.apk
+            apk-report.txt
+          if-no-files-found: error
